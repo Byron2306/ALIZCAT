@@ -679,6 +679,8 @@ const game=document.getElementById("game");
 const ctx=game.getContext("2d",{alpha:false});
 const SCALE=3;
 let W=0,H=0;
+const glyphs = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ#$%&@";
+let streams=[];
 function resize(){
   W=Math.max(320,Math.floor(innerWidth/SCALE));
   H=Math.max(180,Math.floor(innerHeight/SCALE));
@@ -686,9 +688,6 @@ function resize(){
   initRain();
 }
 addEventListener("resize",resize); resize();
-
-const glyphs = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ#$%&@";
-let streams=[];
 function initRain(){
   streams=[];
   const cols = Math.floor(W / 12);
@@ -703,7 +702,6 @@ function initRain(){
     });
   }
 }
-initRain();
 
 function drawBackground(dt){
   // base gradient
