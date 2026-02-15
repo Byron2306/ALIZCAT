@@ -1429,7 +1429,8 @@ window.resetRun = function(){
 let last = performance.now();
 
 function tick(now){
-  const dt = Math.min(0.033, (now-last)/1000);
+  const MAX_FRAME_TIME = 0.033; // ~30fps frame time cap to prevent large time jumps
+  const dt = Math.min(MAX_FRAME_TIME, (now-last)/1000);
   last = now;
 
   drawBackground(dt);
@@ -1474,5 +1475,5 @@ requestAnimationFrame(tick);
   window.addEventListener(evt, ()=>{
     initAudio();
     if(ac && ac.state === "suspended") ac.resume();
-  }, { once:false, passive:true });
+  }, { once:true, passive:true });
 });
