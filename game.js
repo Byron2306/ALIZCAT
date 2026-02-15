@@ -234,16 +234,33 @@ function boom() {
 function speak(line) {
   try {
     if (!("speechSynthesis" in window)) return;
-    const u = new SpeechSynthesisUtterance(line);
-    u.rate = 0.95;
-    u.pitch = 0.55;
-    u.volume = 1.0;
-    // attempt choose a male voice if available
-    const vs = speechSynthesis.getVoices?.() || [];
-    const male = vs.find(v => /male|daniel|alex|fred|david/i.test(v.name));
-    if (male) u.voice = male;
-    speechSynthesis.cancel();
-    speechSynthesis.speak(u);
+    
+    let hasSpoken = false;
+    // Ensure voices are loaded
+    const speakWithVoice = () => {
+      if (hasSpoken) return;
+      hasSpoken = true;
+      const u = new SpeechSynthesisUtterance(line);
+      u.rate = 0.95;
+      u.pitch = 0.55;
+      u.volume = 1.0;
+      // attempt choose a male voice if available
+      const vs = speechSynthesis.getVoices() || [];
+      const male = vs.find(v => /male|daniel|alex|fred|david/i.test(v.name));
+      if (male) u.voice = male;
+      speechSynthesis.cancel();
+      speechSynthesis.speak(u);
+    };
+    
+    // Check if voices are already loaded
+    if (speechSynthesis.getVoices().length > 0) {
+      speakWithVoice();
+    } else {
+      // Wait for voices to load
+      speechSynthesis.addEventListener('voiceschanged', speakWithVoice, { once: true });
+      // Fallback timeout
+      setTimeout(speakWithVoice, 100);
+    }
   } catch {}
 }
 
@@ -276,7 +293,7 @@ function musicStage0() {
 
   function tick() {
     const t = ac.currentTime;
-    bass.frequency.setTargetAtTime(seq[step % seq.length], t, 0.02);
+    bass.frequency.setValueAtTime(seq[step % seq.length], t);
     step++;
     // small click
     beep(880, 0.03, "square", 0.02);
@@ -311,7 +328,7 @@ function musicStage1() {
 
   function tick() {
     const t = ac.currentTime;
-    bass.frequency.setTargetAtTime(seq[step % seq.length], t, 0.02);
+    bass.frequency.setValueAtTime(seq[step % seq.length], t);
     step++;
     beep(660, 0.025, "square", 0.015);
     if (musicNodes.includes(bass)) setTimeout(tick, interval * 1000);
@@ -345,7 +362,7 @@ function musicStage2() {
 
   function tick() {
     const t = ac.currentTime;
-    bass.frequency.setTargetAtTime(seq[step % seq.length], t, 0.015);
+    bass.frequency.setValueAtTime(seq[step % seq.length], t);
     step++;
     // faint hat-ish
     beep(1200, 0.015, "square", 0.012);
@@ -389,8 +406,8 @@ function musicStage3() {
 
   function tick() {
     const t = ac.currentTime;
-    bass.frequency.setTargetAtTime(bseq[step % bseq.length], t, 0.01);
-    arp.frequency.setTargetAtTime(aseq[step % aseq.length], t, 0.01);
+    bass.frequency.setValueAtTime(bseq[step % bseq.length], t);
+    arp.frequency.setValueAtTime(aseq[step % aseq.length], t);
     step++;
     // punchy hat
     beep(1800, 0.012, "square", 0.015);
@@ -1476,3 +1493,12 @@ requestAnimationFrame(tick);
     if(ac && ac.state === "suspended") ac.resume();
   }, { once:false, passive:true });
 });
+
+// Title screen: start game on pointer interaction
+// Use pointerdown to handle both mouse and touch in one event
+UI.title.addEventListener("pointerdown", (e)=>{
+  if(phase === "boot"){
+    e.preventDefault();
+    begin();
+  }
+}, { once: true });
