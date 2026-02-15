@@ -242,10 +242,12 @@ canvas#game{
 }
 
 .card{
+  position: relative;
   border-radius:18px;
   padding:14px;
   background:rgba(0,0,0,.4);
   border:1px solid rgba(255,255,255,.12);
+  overflow: hidden;
 }
 .cardHead{
   display:flex;
@@ -283,7 +285,65 @@ canvas#game{
 
 .typewriter::after{ content:"▋"; animation:blink 1s infinite; }
 .artifact{ letter-spacing:.05em }
-.glitch{ filter:contrast(1.1) saturate(1.1) }
+.glitch{ 
+  filter:contrast(1.1) saturate(1.1);
+  animation: glitch 3s infinite;
+}
+
+@keyframes glitch{
+  0%, 100%{ 
+    transform: translate(0);
+    filter: contrast(1.1) saturate(1.1);
+  }
+  2%, 8%, 15%, 22%, 35%, 47%, 64%, 78%{
+    transform: translate(-2px, 1px) skew(0.5deg);
+    filter: contrast(1.3) saturate(1.4) hue-rotate(5deg);
+  }
+  4%, 11%, 18%, 28%, 41%, 56%, 72%, 85%{
+    transform: translate(2px, -1px) skew(-0.5deg);
+    filter: contrast(1.4) saturate(1.2) hue-rotate(-5deg);
+  }
+  5%, 12%, 20%, 31%, 44%, 60%, 74%, 88%{
+    transform: translate(-1px, 2px);
+    filter: contrast(1.2) saturate(1.3);
+  }
+}
+
+.termA, .termB, .termC{
+  animation: flicker 4s infinite;
+}
+
+@keyframes flicker{
+  0%, 100%{ opacity: 1; }
+  3%, 6%, 12%, 18%, 24%, 35%, 48%, 62%, 76%, 88%{
+    opacity: 0.92;
+  }
+  4%, 8%, 14%, 20%, 28%, 40%, 52%, 66%, 80%, 90%{
+    opacity: 0.85;
+  }
+  5%, 9%, 15%, 22%, 32%, 43%, 56%, 70%, 84%, 92%{
+    opacity: 0.95;
+  }
+}
+
+.card.termA::before,
+.card.termB::before,
+.card.termC::before{
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(transparent 0%, rgba(255,255,255,.02) 2%, transparent 3%);
+  background-size: 100% 50px;
+  animation: scan 8s linear infinite;
+  pointer-events: none;
+  border-radius: 18px;
+  opacity: 0.5;
+}
+
+@keyframes scan{
+  0%{ background-position: 0 -50px; }
+  100%{ background-position: 0 100%; }
+}
 
 .row{ display:flex; gap:8px; }
 .row input{

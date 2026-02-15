@@ -276,7 +276,7 @@ function musicStage0() {
 
   function tick() {
     const t = ac.currentTime;
-    bass.frequency.setTargetAtTime(seq[step % seq.length], t, 0.02);
+    bass.frequency.setValueAtTime(seq[step % seq.length], t);
     step++;
     // small click
     beep(880, 0.03, "square", 0.02);
@@ -311,7 +311,7 @@ function musicStage1() {
 
   function tick() {
     const t = ac.currentTime;
-    bass.frequency.setTargetAtTime(seq[step % seq.length], t, 0.02);
+    bass.frequency.setValueAtTime(seq[step % seq.length], t);
     step++;
     beep(660, 0.025, "square", 0.015);
     if (musicNodes.includes(bass)) setTimeout(tick, interval * 1000);
@@ -345,7 +345,7 @@ function musicStage2() {
 
   function tick() {
     const t = ac.currentTime;
-    bass.frequency.setTargetAtTime(seq[step % seq.length], t, 0.015);
+    bass.frequency.setValueAtTime(seq[step % seq.length], t);
     step++;
     // faint hat-ish
     beep(1200, 0.015, "square", 0.012);
@@ -389,8 +389,8 @@ function musicStage3() {
 
   function tick() {
     const t = ac.currentTime;
-    bass.frequency.setTargetAtTime(bseq[step % bseq.length], t, 0.01);
-    arp.frequency.setTargetAtTime(aseq[step % aseq.length], t, 0.01);
+    bass.frequency.setValueAtTime(bseq[step % bseq.length], t);
+    arp.frequency.setValueAtTime(aseq[step % aseq.length], t);
     step++;
     // punchy hat
     beep(1800, 0.012, "square", 0.015);
@@ -1476,3 +1476,14 @@ requestAnimationFrame(tick);
     if(ac && ac.state === "suspended") ac.resume();
   }, { once:false, passive:true });
 });
+
+// Title screen: start game on click/touch
+UI.title.addEventListener("click", ()=>{
+  if(phase === "boot") begin();
+});
+UI.title.addEventListener("touchstart", (e)=>{
+  if(phase === "boot"){
+    e.preventDefault();
+    begin();
+  }
+}, { passive: false });
