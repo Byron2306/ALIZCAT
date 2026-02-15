@@ -234,16 +234,30 @@ function boom() {
 function speak(line) {
   try {
     if (!("speechSynthesis" in window)) return;
-    const u = new SpeechSynthesisUtterance(line);
-    u.rate = 0.95;
-    u.pitch = 0.55;
-    u.volume = 1.0;
-    // attempt choose a male voice if available
-    const vs = speechSynthesis.getVoices?.() || [];
-    const male = vs.find(v => /male|daniel|alex|fred|david/i.test(v.name));
-    if (male) u.voice = male;
-    speechSynthesis.cancel();
-    speechSynthesis.speak(u);
+    
+    // Ensure voices are loaded
+    const speakWithVoice = () => {
+      const u = new SpeechSynthesisUtterance(line);
+      u.rate = 0.95;
+      u.pitch = 0.55;
+      u.volume = 1.0;
+      // attempt choose a male voice if available
+      const vs = speechSynthesis.getVoices() || [];
+      const male = vs.find(v => /male|daniel|alex|fred|david/i.test(v.name));
+      if (male) u.voice = male;
+      speechSynthesis.cancel();
+      speechSynthesis.speak(u);
+    };
+    
+    // Check if voices are already loaded
+    if (speechSynthesis.getVoices().length > 0) {
+      speakWithVoice();
+    } else {
+      // Wait for voices to load
+      speechSynthesis.addEventListener('voiceschanged', speakWithVoice, { once: true });
+      // Fallback timeout
+      setTimeout(speakWithVoice, 100);
+    }
   } catch {}
 }
 
