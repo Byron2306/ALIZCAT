@@ -235,8 +235,11 @@ function speak(line) {
   try {
     if (!("speechSynthesis" in window)) return;
     
+    let hasSpoken = false;
     // Ensure voices are loaded
     const speakWithVoice = () => {
+      if (hasSpoken) return;
+      hasSpoken = true;
       const u = new SpeechSynthesisUtterance(line);
       u.rate = 0.95;
       u.pitch = 0.55;
@@ -1491,13 +1494,11 @@ requestAnimationFrame(tick);
   }, { once:false, passive:true });
 });
 
-// Title screen: start game on click/touch
-UI.title.addEventListener("click", ()=>{
-  if(phase === "boot") begin();
-});
-UI.title.addEventListener("touchstart", (e)=>{
+// Title screen: start game on pointer interaction
+// Use pointerdown to handle both mouse and touch in one event
+UI.title.addEventListener("pointerdown", (e)=>{
   if(phase === "boot"){
     e.preventDefault();
     begin();
   }
-}, { passive: false });
+}, { once: true });
