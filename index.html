@@ -8,31 +8,36 @@
 </head>
 <body>
 
-<!-- ================= TITLE / BOOT ================= -->
-<div class="overlay" id="title" onclick="begin()">
+<!-- TITLE -->
+<div class="overlay" id="title">
   <div class="box titleBox">
     <div class="titleWrap">
       <div class="titleText">
-<pre class="ascii grad">
+        <pre class="ascii grad" id="asciiTitle">
 ╔══════════════════════════════════════════╗
 ║            A L I Z A ' S                 ║
 ║              R E V E N G E               ║
-║     DEFENSE SIM → FIGHT TO SURVIVE       ║
-║        TAP ANYWHERE TO START             ║
+║   DEFENSE SIM (PORTRAIT) → FIGHT (LAND)  ║
 ╚══════════════════════════════════════════╝
-</pre>
-        <div class="tap blink">TAP ANYWHERE TO START</div>
+        </pre>
+
+        <div class="tap blink" id="tapToStart">TAP ANYWHERE TO START</div>
         <div class="tap subtle" id="bootStatus">(awaiting input)</div>
-        <div class="tap subtle small">rotate to landscape for combat · pinch zoom enabled</div>
+        <div class="tap subtle small" id="orientHint">
+          Tip: Play puzzles in portrait. Rotate to landscape for the fight.
+        </div>
       </div>
 
-      <!-- pixel portrait -->
-      <canvas id="portrait" width="128" height="128"></canvas>
+      <!-- Pixel Aliza portrait (always visible on title) -->
+      <div class="portraitWrap">
+        <canvas id="portrait" width="128" height="128" aria-label="Aliza portrait"></canvas>
+        <div class="portraitCaption">ALIZA // OPERATOR</div>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- ================= AGENT POPUP ================= -->
+<!-- AGENT POPUP -->
 <div class="agentWrap" id="agentWrap">
   <div class="agentBox">
     <canvas class="agentSprite" id="agentSprite" width="56" height="56"></canvas>
@@ -46,24 +51,24 @@
   </div>
 </div>
 
-<!-- ================= GLITCH BANNER ================= -->
+<!-- BANNER -->
 <div class="bannerWrap" id="bannerWrap">
   <div class="banner" id="bannerText">FIGHT TO SURVIVE</div>
 </div>
 
-<!-- ================= COMPROMISED ================= -->
+<!-- COMPROMISED -->
 <div class="compWrap" id="compWrap">
   <div class="compCenter">
     <div>
       <div class="compText" id="compText">YOU'VE BEEN COMPROMISED!</div>
-      <div class="compSub">SYSTEM GLYPH CORRUPTION // RESET REQUIRED</div>
-      <button class="startBtn" onclick="resetRun()">RESET RUN</button>
+      <div class="compSub" id="compSub">SYSTEM GLYPH CORRUPTION // RESET REQUIRED</div>
+      <button class="startBtn" id="resetBtn">RESET RUN</button>
     </div>
   </div>
 </div>
 
-<!-- ================= CONSOLE ================= -->
-<div class="overlay consoleOverlay" id="console" style="display:none">
+<!-- CONSOLE / PUZZLES -->
+<div class="consoleOverlay" id="console" style="display:none">
   <div class="box consoleBox" id="consoleBox">
 
     <div class="topRow">
@@ -75,10 +80,8 @@
 
     <div class="layout">
 
-      <!-- ========== LEFT: TERMINALS ========== -->
       <div class="stack">
-
-        <!-- VECTOR 1 -->
+        <!-- Vector 1 -->
         <section class="card termA" id="card1">
           <header class="cardHead">
             <h3>Vector 01 — Packet Reassembly</h3>
@@ -92,7 +95,7 @@
           <div class="msg" id="p1msg"></div>
         </section>
 
-        <!-- VECTOR 2 -->
+        <!-- Vector 2 -->
         <section class="card termB" id="card2">
           <header class="cardHead">
             <h3>Vector 02 — Log Triage</h3>
@@ -106,7 +109,7 @@
           <div class="msg" id="p2msg"></div>
         </section>
 
-        <!-- VECTOR 3 -->
+        <!-- Vector 3 -->
         <section class="card termC" id="card3">
           <header class="cardHead">
             <h3>Vector 03 — Integrity Gate</h3>
@@ -119,12 +122,10 @@
           </div>
           <div class="msg" id="p3msg"></div>
         </section>
-
       </div>
 
-      <!-- ========== RIGHT: TOOLS ========== -->
+      <!-- Tools -->
       <aside class="tools" id="tools">
-
         <div class="toolsTop">
           <div class="toolsTitle">Tools // Assistant Panel</div>
           <button class="toolsToggle" id="toolsToggle">Collapse</button>
@@ -136,11 +137,8 @@
           <button class="tab" data-tab="checksum">Checksum</button>
         </div>
 
-        <!-- DECODER -->
         <div class="toolPane active" id="tab-decoder">
-          <div class="tiny">
-            Reassemble the payload. One transformation is reversed.
-          </div>
+          <div class="tiny">Reassemble the payload. One transformation is reversed.</div>
           <div class="toolRow">
             <button id="dSort">Sort</button>
             <button id="dJoin">Join</button>
@@ -152,7 +150,6 @@
           <div class="tiny subtle" id="dStats">—</div>
         </div>
 
-        <!-- TRIAGE -->
         <div class="toolPane" id="tab-triage">
           <div class="tiny">Filter logs until one survives.</div>
           <div class="toolRow">
@@ -170,11 +167,8 @@
           <div class="tiny subtle" id="tStats">Matches: —</div>
         </div>
 
-        <!-- CHECKSUM -->
         <div class="toolPane" id="tab-checksum">
-          <div class="tiny">
-            checksum(text) = sum(ASCII) mod 97
-          </div>
+          <div class="tiny">checksum(text) = sum(ASCII) mod 97</div>
           <input class="toolIn" id="cIn" placeholder="type phrase…" />
           <div class="toolRow">
             <button id="cCalc">Compute</button>
@@ -185,19 +179,17 @@
           </div>
           <textarea class="toolOut" id="cOut"></textarea>
         </div>
-
       </aside>
     </div>
 
-    <div class="footerNote subtle">
-      Incorrect answers trigger an alarm, red flash, and -05 seconds.
+    <div class="footerNote subtle" id="consoleFooter">
+      Portrait = puzzles. Rotate to landscape after 3/3 to fight.
     </div>
-
   </div>
 </div>
 
-<!-- ================= FIGHT HUD ================= -->
-<div class="fightHUD" id="fightHUD">
+<!-- FIGHT HUD -->
+<div class="fightHUD" id="fightHUD" style="display:none">
   <div class="hudRow">
     <div class="hpPanel">
       <div class="hpName">ALIZA</div>
@@ -212,8 +204,8 @@
   <div class="hudHint" id="hudHint">← → move · ↓ duck · Z/X punch · A/S kick</div>
 </div>
 
-<!-- ================= MOBILE CONTROLS ================= -->
-<div class="mobileControls" id="mobileControls">
+<!-- MOBILE CONTROLS -->
+<div class="mobileControls" id="mobileControls" style="display:none">
   <div class="mLeft">
     <button class="mBtn" data-act="left">◀</button>
     <button class="mBtn" data-act="right">▶</button>
@@ -227,7 +219,7 @@
   </div>
 </div>
 
-<!-- ================= CANVAS ================= -->
+<!-- BACKGROUND CANVAS -->
 <canvas id="game"></canvas>
 
 <script src="game.js"></script>
